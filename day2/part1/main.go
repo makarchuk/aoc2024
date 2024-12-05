@@ -18,7 +18,7 @@ func main() {
 
 	scanner := bufio.NewScanner(os.Stdin)
 	for scanner.Scan() {
-		levels, err := helpers.ParseIntsArray(scanner.Text())
+		levels, err := helpers.ParseIntsArray(scanner.Text(), " ")
 		if err != nil {
 			panic(err)
 		}

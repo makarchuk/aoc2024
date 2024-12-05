@@ -5,9 +5,9 @@ import (
 	"strings"
 )
 
-func ParseIntsArray(input string) ([]int, error) {
+func ParseIntsArray(input string, sep string) ([]int, error) {
 	var result []int
-	for _, s := range strings.Split(input, " ") {
+	for _, s := range strings.Split(input, sep) {
 		n, err := strconv.Atoi(s)
 		if err != nil {
 			return nil, err
