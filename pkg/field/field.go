@@ -10,8 +10,12 @@ type Point struct {
 	X, Y int
 }
 
-func (p Point) Add(p2 Point) Point {
-	return Point{p.X + p2.X, p.Y + p2.Y}
+func (p Point) Add(other Point) Point {
+	return Point{p.X + other.X, p.Y + other.Y}
+}
+
+func (p Point) Sub(other Point) Point {
+	return Point{p.X - other.X, p.Y - other.Y}
 }
 
 func (p Point) Move(d Direction) Point {
@@ -58,10 +62,8 @@ func New(io io.Reader) (*Field, error) {
 	y := 0
 	for scanner.Scan() {
 		line := scanner.Bytes()
-		row := make([]byte, 0, len(line))
-		for _, char := range line {
-			row = append(row, char)
-		}
+		row := make([]byte, len(line))
+		copy(row, line)
 		field.field = append(field.field, row)
 		y++
 	}
@@ -69,11 +71,15 @@ func New(io io.Reader) (*Field, error) {
 	return field, nil
 }
 
-func (f *Field) Get(x, y int) byte {
-	if x < 0 || x > f.size.X || y < 0 || y > f.size.Y {
+func (f *Field) InField(p Point) bool {
+	return p.X >= 0 && p.Y >= 0 && p.X <= f.size.X && p.Y <= f.size.Y
+}
+
+func (f *Field) Get(p Point) byte {
+	if !f.InField(p) {
 		return 0
 	}
-	return f.field[y][x]
+	return f.field[p.Y][p.X]
 }
 
 func (f *Field) Replace(p Point, value byte) Field {

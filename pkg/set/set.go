@@ -4,8 +4,8 @@ type Set[T comparable] struct {
 	m map[T]struct{}
 }
 
-func New[T comparable]() *Set[T] {
-	return &Set[T]{m: make(map[T]struct{})}
+func New[T comparable]() Set[T] {
+	return Set[T]{m: make(map[T]struct{})}
 }
 
 func (s *Set[T]) Add(v T) {

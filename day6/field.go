@@ -21,7 +21,7 @@ func New(io io.Reader) (*Input, error) {
 	}
 	for y := range f.Size().Y {
 		for x := range f.Size().X {
-			char := f.Get(x, y)
+			char := f.Get(field.Point{x, y})
 			switch char {
 			case '^':
 				return &Input{
@@ -96,7 +96,7 @@ func (g *Guard) NextPosition(f field.Field) (field.Point, error) {
 	if newCoordinates.X < 0 || newCoordinates.X > f.Size().X || newCoordinates.Y < 0 || newCoordinates.Y > f.Size().Y {
 		return field.Point{}, ErrorOutOfField
 	}
-	if f.Get(newCoordinates.X, newCoordinates.Y) == '#' {
+	if f.Get(newCoordinates) == '#' {
 		g.orientation = g.orientation.TurnRight()
 		return g.position, nil
 	}
