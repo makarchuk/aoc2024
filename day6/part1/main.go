@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/makarchuk/aoc2024/day6"
+	"github.com/makarchuk/aoc2024/pkg/field"
 	"github.com/makarchuk/aoc2024/pkg/set"
 )
 
@@ -14,11 +15,11 @@ func main() {
 		panic(err)
 	}
 
-	guard := input.GetGuard()
-	visitedPoints := set.New[day6.Point]()
+	guard := input.OriginalGuard
+	visitedPoints := set.New[field.Point]()
 	for {
 		visitedPoints.Add(guard.Position())
-		err := guard.Move(*input)
+		err := guard.Move(input.Field)
 		if err != nil {
 			break
 		}
