@@ -6,6 +6,21 @@ type List[Item cmp.Ordered] struct {
 	items []Item
 }
 
+func (l *List[Item]) Len() int {
+	return len(l.items)
+}
+
+func (l *List[Item]) Pop() (Item, bool) {
+	var item Item
+	if l.Len() == 0 {
+		return item, false
+	}
+
+	item = l.items[0]
+	l.items = l.items[1:]
+	return item, true
+}
+
 func (l *List[Item]) Add(item Item) {
 	for i, v := range l.items {
 		if item < v {
