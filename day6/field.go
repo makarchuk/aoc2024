@@ -21,7 +21,10 @@ func New(io io.Reader) (*Input, error) {
 	}
 	for y := range f.Size().Y {
 		for x := range f.Size().X {
-			char := f.Get(field.Point{x, y})
+			char, ok := f.Get(field.Point{x, y})
+			if !ok {
+				return nil, fmt.Errorf("out of range")
+			}
 			switch char {
 			case '^':
 				return &Input{
@@ -96,7 +99,11 @@ func (g *Guard) NextPosition(f field.Field) (field.Point, error) {
 	if newCoordinates.X < 0 || newCoordinates.X > f.Size().X || newCoordinates.Y < 0 || newCoordinates.Y > f.Size().Y {
 		return field.Point{}, ErrorOutOfField
 	}
-	if f.Get(newCoordinates) == '#' {
+	char, ok := f.Get(newCoordinates)
+	if !ok {
+		panic("out of range")
+	}
+	if char == '#' {
 		g.orientation = g.orientation.TurnRight()
 		return g.position, nil
 	}

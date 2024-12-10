@@ -28,7 +28,10 @@ func ReadInput(in io.Reader) (*Input, error) {
 
 	for x := range space.Size().X + 1 {
 		for y := range space.Size().Y + 1 {
-			char := space.Get(field.Point{X: x, Y: y})
+			char, ok := space.Get(field.Point{X: x, Y: y})
+			if !ok {
+				panic("out of range")
+			}
 			if char == '.' {
 				continue
 			}

@@ -75,11 +75,11 @@ func (f *Field) InField(p Point) bool {
 	return p.X >= 0 && p.Y >= 0 && p.X <= f.size.X && p.Y <= f.size.Y
 }
 
-func (f *Field) Get(p Point) byte {
+func (f *Field) Get(p Point) (byte, bool) {
 	if !f.InField(p) {
-		return 0
+		return 0, false
 	}
-	return f.field[p.Y][p.X]
+	return f.field[p.Y][p.X], true
 }
 
 func (f *Field) Replace(p Point, value byte) Field {
