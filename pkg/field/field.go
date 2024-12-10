@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"iter"
 )
 
 type Point struct {
@@ -82,6 +83,10 @@ func (f *Field) Get(p Point) (byte, bool) {
 	return f.field[p.Y][p.X], true
 }
 
+func (f *Field) Set(p Point, value byte) {
+	f.field[p.Y][p.X] = value
+}
+
 func (f *Field) Replace(p Point, value byte) Field {
 	newField := Field{
 		field: make([][]byte, len(f.field)),
@@ -97,4 +102,16 @@ func (f *Field) Replace(p Point, value byte) Field {
 		newField.field[y] = newRow
 	}
 	return newField
+}
+
+func (f *Field) Iter() iter.Seq[Point] {
+	return func(yield func(Point) bool) {
+		for y, row := range f.field {
+			for x := range row {
+				if !yield(Point{x, y}) {
+					return
+				}
+			}
+		}
+	}
 }
