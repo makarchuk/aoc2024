@@ -12,6 +12,8 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	peaks, _ := day10.TerrainScore(terrain)
-	fmt.Println(peaks)
+
+	_, trails := day10.TerrainScore(terrain)
+	fmt.Println(trails)
+
 }

@@ -5,7 +5,6 @@ import (
 	"io"
 
 	"github.com/makarchuk/aoc2024/pkg/field"
-	"github.com/makarchuk/aoc2024/pkg/set"
 )
 
 type Terrain struct {
@@ -40,49 +39,51 @@ func New(in io.Reader) (*Terrain, error) {
 	}, nil
 }
 
-func TerrainScore(t *Terrain) int {
-	totalScore := 0
+func TerrainScore(t *Terrain) (int, int) {
+	totalPeaks := 0
+	totalTrails := 0
+
 	for point := range t.space.Iter() {
 		elevation, _ := t.space.Get(point)
 		if elevation == 0 {
-			score := score(point, t.space)
-
-			totalScore += score
+			peaks, trails := score(point, t.space)
+			totalPeaks += peaks
+			totalTrails += trails
 		}
 
 	}
-	return totalScore
+	return totalPeaks, totalTrails
 }
 
-func score(p field.Point, space field.Field) int {
+func score(p field.Point, space field.Field) (int, int) {
 	var expectedElevation byte = 1
-	currentSurface := set.New[field.Point]()
-	currentSurface.Add(p)
-	visited := set.New[field.Point]()
+	currentSurface := map[field.Point]int{
+		p: 1,
+	}
 
 	for {
-		nextSurface := set.New[field.Point]()
-		for _, point := range currentSurface.List() {
+		nextSurface := map[field.Point]int{}
+		for point, trails := range currentSurface {
 			for _, surroundingPoint := range surroundingPoints {
 				newPoint := point.Add(surroundingPoint)
-				if visited.Contains(newPoint) {
-					continue
-				}
 				elevation, ok := space.Get(newPoint)
 				if !ok {
 					continue
 				}
 				if elevation == expectedElevation {
-					visited.Add(newPoint)
-					nextSurface.Add(newPoint)
+					nextSurface[newPoint] += trails
 				}
 			}
 		}
 		if expectedElevation == 9 {
-			return nextSurface.Len()
+			totalScore := 0
+			for _, value := range nextSurface {
+				totalScore += value
+			}
+			return len(nextSurface), totalScore
 		}
-		if len(nextSurface.List()) == 0 {
-			return 0
+		if len(nextSurface) == 0 {
+			return 0, 0
 		}
 		currentSurface = nextSurface
 		expectedElevation++
