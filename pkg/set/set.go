@@ -8,6 +8,14 @@ func New[T comparable]() Set[T] {
 	return Set[T]{m: make(map[T]struct{})}
 }
 
+func From[T comparable](l []T) Set[T] {
+	s := New[T]()
+	for _, v := range l {
+		s.Add(v)
+	}
+	return s
+}
+
 func (s *Set[T]) Add(v T) {
 	s.m[v] = struct{}{}
 }
