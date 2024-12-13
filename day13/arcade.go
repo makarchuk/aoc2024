@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"fmt"
 	"io"
-	"slices"
 
 	"github.com/makarchuk/aoc2024/pkg/field"
 )
@@ -15,23 +14,59 @@ type Arcade struct {
 	Target  field.Point
 }
 
-func (a *Arcade) OptimalSolution() int {
-	possibleSolutions := []int{}
+func (m *Arcade) OptimalSolution() int {
+	x := m.Target.X
+	x1 := m.OffsetA.X
+	x2 := m.OffsetB.X
 
-	minIncluded := min(a.Target.X/a.OffsetA.X, a.Target.Y/a.OffsetA.Y)
-	for i := 0; i <= minIncluded; i++ {
-		remainder := a.Target.Sub(a.OffsetA.Mul(i))
-		if remainder.X%a.OffsetB.X == 0 && remainder.Y%a.OffsetB.Y == 0 {
-			if remainder.X/a.OffsetB.X == remainder.Y/a.OffsetB.Y {
-				price := 3*i + 1*(remainder.X/a.OffsetB.X)
-				possibleSolutions = append(possibleSolutions, price)
-			}
-		}
-	}
-	if len(possibleSolutions) == 0 {
+	y := m.Target.Y
+	y1 := m.OffsetA.Y
+	y2 := m.OffsetB.Y
+
+	aNumerator := (x*y2 - x2*y)
+	aDenominator := (x1*y2 - x2*y1)
+
+	if aNumerator%aDenominator != 0 {
 		return 0
 	}
-	return slices.Min(possibleSolutions)
+
+	a := aNumerator / aDenominator
+
+	bNumerator := x - a*x1
+	bDenominator := x2
+
+	if bNumerator%bDenominator != 0 {
+		return 0
+	}
+
+	b := bNumerator / bDenominator
+
+	if a < 0 || b < 0 {
+		return 0
+	}
+
+	return 3*a + b
+}
+
+func (m *Arcade) calculateStep() (int, int, bool) {
+	remTarget := m.Target.X % m.OffsetB.X
+	remA := m.OffsetA.X % m.OffsetB.X
+	fmt.Printf("remTarget: %v, remA: %v. Offset: %v\n", remTarget, remA, m.OffsetB.X)
+	if remA == 0 && remTarget != 0 {
+		return 0, 0, false
+	}
+	i := 0
+	firstMatch := -1
+	for {
+		if (i*remA)%m.OffsetB.X == remTarget {
+			if firstMatch == -1 {
+				firstMatch = i
+			} else {
+				return firstMatch, i - firstMatch, true
+			}
+		}
+		i++
+	}
 }
 
 func ParseArcades(input io.Reader) ([]Arcade, error) {
