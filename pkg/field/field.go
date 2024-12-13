@@ -19,6 +19,10 @@ func (p Point) Sub(other Point) Point {
 	return Point{p.X - other.X, p.Y - other.Y}
 }
 
+func (p Point) Mul(n int) Point {
+	return Point{p.X * n, p.Y * n}
+}
+
 func (p Point) Move(d Direction) Point {
 	switch d {
 	case UP:
