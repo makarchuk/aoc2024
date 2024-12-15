@@ -73,7 +73,6 @@ func (i *Input) SafetyFactor() int {
 	}
 
 	factor := 1
-	fmt.Println(quardrants)
 	for _, q := range quardrants {
 		factor *= q
 	}

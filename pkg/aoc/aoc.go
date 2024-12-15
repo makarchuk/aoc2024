@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/makarchuk/aoc2024/day14"
 	"github.com/makarchuk/aoc2024/day15"
 	_ "github.com/makarchuk/aoc2024/day15"
 )
@@ -29,6 +30,8 @@ func Call(day int, part int, r io.Reader) (string, error) {
 }
 
 func init() {
+	Register(14, 1, day14.Part1)
+	Register(14, 2, day14.Part2)
 	Register(15, 1, day15.Part1)
 	Register(15, 2, day15.Part2)
 }
