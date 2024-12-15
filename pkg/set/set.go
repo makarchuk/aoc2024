@@ -16,20 +16,20 @@ func From[T comparable](l []T) Set[T] {
 	return s
 }
 
-func (s *Set[T]) Add(v T) {
+func (s Set[T]) Add(v T) {
 	s.m[v] = struct{}{}
 }
 
-func (s *Set[T]) Contains(v T) bool {
+func (s Set[T]) Contains(v T) bool {
 	_, ok := s.m[v]
 	return ok
 }
 
-func (s *Set[T]) Len() int {
+func (s Set[T]) Len() int {
 	return len(s.m)
 }
 
-func (s *Set[T]) List() []T {
+func (s Set[T]) List() []T {
 	var l []T
 	for k := range s.m {
 		l = append(l, k)
@@ -37,6 +37,27 @@ func (s *Set[T]) List() []T {
 	return l
 }
 
-func (s *Set[T]) Remove(v T) {
+func (s Set[T]) Remove(v T) {
 	delete(s.m, v)
+}
+
+func (s Set[T]) Clone() Set[T] {
+	c := New[T]()
+	for k := range s.m {
+		c.Add(k)
+	}
+	return c
+}
+
+func (s Set[T]) Equal(o Set[T]) bool {
+	if s.Len() != o.Len() {
+		return false
+	}
+
+	for k := range s.m {
+		if !o.Contains(k) {
+			return false
+		}
+	}
+	return true
 }

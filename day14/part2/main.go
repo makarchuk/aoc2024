@@ -15,9 +15,7 @@ func main() {
 	}
 
 	inp.Size = field.Point{X: 101, Y: 103}
-
 	inp.Print()
-
 	for step := range 50000 {
 		inp.Step()
 		if inp.ContainsVerticalLine() {
