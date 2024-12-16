@@ -67,6 +67,10 @@ func (d Direction) TurnRight() Direction {
 	return (d + 1) % 4
 }
 
+func (d Direction) TurnLeft() Direction {
+	return (d + 3) % 4
+}
+
 type Field struct {
 	field [][]byte
 
