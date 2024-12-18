@@ -46,6 +46,22 @@ func Part1(in io.Reader) (string, error) {
 	return fmt.Sprintf("%d", s), nil
 }
 
+func Part2(in io.Reader) (string, error) {
+	input, err := ReadInput(in, DEBUG)
+	if err != nil {
+		return "", err
+	}
+	for _, pixel := range input.Pixels {
+		input.Screen = input.Screen.Replace(pixel, BROKEN)
+		_, err := input.FindRoute(field.Point{0, 0}, input.Size)
+		if err != nil {
+			return fmt.Sprintf("%d,%d", pixel.X, pixel.Y), nil
+		}
+	}
+
+	return "", fmt.Errorf("found a solution for every pixel")
+}
+
 func ReadInput(in io.Reader, debug bool) (Input, error) {
 	input := Input{}
 	scanner := bufio.NewScanner(in)
