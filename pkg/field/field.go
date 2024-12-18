@@ -81,6 +81,22 @@ func (f Field) Size() Point {
 	return f.size
 }
 
+func Create(size Point, fill byte) Field {
+	field := Field{
+		field: make([][]byte, size.Y+1),
+		size:  size,
+	}
+
+	for y := range size.Y + 1 {
+		field.field[y] = make([]byte, size.X+1)
+		for x := range size.X + 1 {
+			field.field[y][x] = fill
+		}
+	}
+
+	return field
+}
+
 func New(io io.Reader) (*Field, error) {
 	scanner := bufio.NewScanner(io)
 	field, err := Read(scanner)

@@ -8,6 +8,7 @@ import (
 	"github.com/makarchuk/aoc2024/day15"
 	"github.com/makarchuk/aoc2024/day16"
 	"github.com/makarchuk/aoc2024/day17"
+	"github.com/makarchuk/aoc2024/day18"
 )
 
 type entry struct {
@@ -39,4 +40,5 @@ func init() {
 	Register(16, 2, day16.Part2)
 	Register(17, 1, day17.Part1)
 	Register(17, 2, day17.Part2)
+	Register(18, 1, day18.Part1)
 }
