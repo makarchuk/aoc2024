@@ -44,4 +44,5 @@ func init() {
 	Register(18, 1, day18.Part1)
 	Register(18, 2, day18.Part2)
 	Register(19, 1, day19.Part1)
+	Register(19, 2, day19.Part2)
 }

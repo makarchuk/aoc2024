@@ -26,6 +26,22 @@ func Part1(in io.Reader) (string, error) {
 	return fmt.Sprintf("%d", constructible), nil
 }
 
+func Part2(in io.Reader) (string, error) {
+	input, err := ParseInput(in)
+	if err != nil {
+		return "", fmt.Errorf("failed to parse input: %w", err)
+	}
+
+	patternsTotal := 0
+	for _, pattern := range input.Patterns {
+		waysToConstruct := input.ConstructPattern(pattern)
+
+		patternsTotal += waysToConstruct
+	}
+
+	return fmt.Sprintf("%d", patternsTotal), nil
+}
+
 type Input struct {
 	Towels   []string
 	Patterns []string
@@ -84,17 +100,19 @@ func (in *Input) ConstructPattern(pattern string) int {
 				continue
 			}
 
-			// towels := make([]string, len(state.Towels))
-			// copy(towels, state.Towels)
-			// towels = append(towels, towel)
-
 			remaining := strings.TrimPrefix(state.Remaining, towel)
-			remainingPaths, ok := cameFrom[remaining]
+			waysToReach, ok := cameFrom[remaining]
 			if !ok {
-				remainingPaths = set.New[string]()
+				waysToReach = set.New[string]()
 			}
+
 			//we're storing where did we came from to reach this state
-			remainingPaths.Add(state.Remaining)
+			waysToReach.Add(state.Remaining)
+
+			cameFrom[remaining] = waysToReach
+			if len(remaining) == 0 {
+				break
+			}
 
 			// fmt.Printf("remaining before:%v, after: %v, towel: `%v`\n", state.Remaining, remaining, towel)
 			if !ok {
@@ -108,21 +126,40 @@ func (in *Input) ConstructPattern(pattern string) int {
 		}
 	}
 
-	countWays := 0
+	// fmt.Printf("found no path for %v. Bailing\n", pattern)
 
-	surface := []string{pattern}
+	if _, ok := cameFrom[""]; !ok {
+		return 0
+	}
+	// fmt.Printf("found path to %v. Scoring\n", pattern)
 
-	for {
-		newSurface := []string{}
+	cache := make(map[string]int)
 
-		for _, path := range surface {
-			cameFromPaths, ok := cameFrom[path]
+	return countWays(pattern, cameFrom, "", cache)
+}
 
-			if !ok {
-				panic(fmt.Sprintf("don't know how we reached %v", path))
-			}
+func countWays(pattern string, visitsMap map[string]set.Set[string], start string, cache map[string]int) int {
+	score := 0
 
-		}
+	if pattern == start {
+		return 1
 	}
 
+	parents := visitsMap[start]
+	if parents.Len() == 0 {
+		panic("should not be happening")
+	}
+
+	for _, parent := range parents.List() {
+		if parentScore, ok := cache[parent]; ok {
+			score += parentScore
+			continue
+		}
+
+		parentScore := countWays(pattern, visitsMap, parent, cache)
+		cache[parent] = parentScore
+		score += parentScore
+	}
+
+	return score
 }
