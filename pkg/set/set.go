@@ -1,5 +1,7 @@
 package set
 
+import "encoding/json"
+
 type Set[T comparable] struct {
 	m map[T]struct{}
 }
@@ -60,4 +62,8 @@ func (s Set[T]) Equal(o Set[T]) bool {
 		}
 	}
 	return true
+}
+
+func (s Set[T]) MarshalJSON() ([]byte, error) {
+	return json.Marshal(s.List())
 }

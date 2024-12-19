@@ -73,15 +73,11 @@ func ParseInput(in io.Reader) (Input, error) {
 }
 
 type patternConstructorState struct {
-	// Towels    []string
-	Towels    int
 	Remaining string
 }
 
 func (in *Input) ConstructPattern(pattern string) int {
 	state := patternConstructorState{
-		// Towels:    []string{},
-		Towels:    0,
 		Remaining: pattern,
 	}
 
@@ -96,11 +92,11 @@ func (in *Input) ConstructPattern(pattern string) int {
 		}
 
 		for _, towel := range in.Towels {
-			if !strings.HasPrefix(state.Remaining, towel) {
+			if !strings.HasSuffix(state.Remaining, towel) {
 				continue
 			}
 
-			remaining := strings.TrimPrefix(state.Remaining, towel)
+			remaining := strings.TrimSuffix(state.Remaining, towel)
 			waysToReach, ok := cameFrom[remaining]
 			if !ok {
 				waysToReach = set.New[string]()
@@ -117,8 +113,6 @@ func (in *Input) ConstructPattern(pattern string) int {
 			// fmt.Printf("remaining before:%v, after: %v, towel: `%v`\n", state.Remaining, remaining, towel)
 			if !ok {
 				states.Push(-len(remaining), patternConstructorState{
-					// Towels:    towels,
-					Towels:    state.Towels + 1,
 					Remaining: remaining,
 				})
 			}
