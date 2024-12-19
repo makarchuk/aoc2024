@@ -107,7 +107,7 @@ func (in *Input) ConstructPattern(pattern string) int {
 
 			cameFrom[remaining] = waysToReach
 			if len(remaining) == 0 {
-				break
+				continue
 			}
 
 			// fmt.Printf("remaining before:%v, after: %v, towel: `%v`\n", state.Remaining, remaining, towel)
@@ -135,20 +135,19 @@ func (in *Input) ConstructPattern(pattern string) int {
 }
 
 func countWays(pattern string, visitsMap map[string]set.Set[string], start string, cache map[string]int) int {
-	score := 0
-
 	parents := visitsMap[start]
 	if parents.Len() == 0 {
 		panic("should not be happening")
 	}
 
+	score := 0
 	for _, parent := range parents.List() {
-		if parentScore, ok := cache[parent]; ok {
-			score += parentScore
-			continue
+		parentScore, ok := cache[parent]
+		if !ok {
+			parentScore = countWays(pattern, visitsMap, parent, cache)
+			// fmt.Printf("score for %v is %v, parents: %v\n", parent, parentScore, visitsMap[parent].List())
 		}
 
-		parentScore := countWays(pattern, visitsMap, parent, cache)
 		cache[parent] = parentScore
 		score += parentScore
 	}
