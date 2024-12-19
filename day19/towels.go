@@ -127,17 +127,15 @@ func (in *Input) ConstructPattern(pattern string) int {
 	}
 	// fmt.Printf("found path to %v. Scoring\n", pattern)
 
-	cache := make(map[string]int)
+	cache := map[string]int{
+		pattern: 1,
+	}
 
 	return countWays(pattern, cameFrom, "", cache)
 }
 
 func countWays(pattern string, visitsMap map[string]set.Set[string], start string, cache map[string]int) int {
 	score := 0
-
-	if pattern == start {
-		return 1
-	}
 
 	parents := visitsMap[start]
 	if parents.Len() == 0 {
