@@ -6,10 +6,16 @@ import (
 	"io"
 	"iter"
 	"slices"
+
+	"github.com/makarchuk/aoc2024/pkg/helpers"
 )
 
 type Point struct {
 	X, Y int
+}
+
+func (p Point) ManhattanDistance(other Point) int {
+	return helpers.Abs(p.X-other.X) + helpers.Abs(p.Y-other.Y)
 }
 
 func (p Point) Add(other Point) Point {
@@ -59,7 +65,7 @@ func (d Direction) String() string {
 	case LEFT:
 		return "<"
 	default:
-		panic(fmt.Sprintf("invalid direction: %v", d))
+		panic(fmt.Sprintf("invalid direction: %d", d))
 	}
 }
 
