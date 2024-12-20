@@ -1,6 +1,9 @@
 package set
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"iter"
+)
 
 type Set[T comparable] struct {
 	m map[T]struct{}
@@ -37,6 +40,16 @@ func (s Set[T]) List() []T {
 		l = append(l, k)
 	}
 	return l
+}
+
+func (s Set[T]) Iter() iter.Seq[T] {
+	return func(yield func(T) bool) {
+		for k := range s.m {
+			if !yield(k) {
+				return
+			}
+		}
+	}
 }
 
 func (s Set[T]) Remove(v T) {
