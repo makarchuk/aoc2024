@@ -50,4 +50,5 @@ func init() {
 	Register(20, 1, day20.Part1)
 	Register(20, 2, day20.Part2)
 	Register(21, 1, day21.Part1)
+	Register(21, 2, day21.Part2)
 }

@@ -22,22 +22,29 @@ func TestSingleRobotE2E(t *testing.T) {
 	} {
 		testName := fmt.Sprintf("combination %s", tc.combination)
 		t.Run(testName, func(t *testing.T) {
-			directPresser := day21.NewManualPresser()
+			// directPresser := day21.NewManualPresser()
 
-			indirectPresser := day21.NewRobotPresser(
-				day21.NumberPadButtons,
-				directPresser,
-				"only",
+			// indirectPresser := day21.NewRobotPresser(
+			// 	day21.NumberPadButtons,
+			// 	directPresser,
+			// 	"only",
+			// )
+
+			// total := []byte{}
+
+			// for _, c := range tc.combination {
+			// 	res := indirectPresser.Press(byte(c))
+			// 	total = append(total, res...)
+			// }
+
+			// require.Len(t, total, tc.pressesCount, day21.PrintPresses(total))
+
+			robot := day21.BuildPrecalculatedCostProvider(
+				*day21.NewPad(day21.NumberPadButtons),
+				day21.ManualPresser{},
 			)
-
-			total := []byte{}
-
-			for _, c := range tc.combination {
-				res := indirectPresser.Press(byte(c))
-				total = append(total, res...)
-			}
-
-			require.Len(t, total, tc.pressesCount, day21.PrintPresses(total))
+			precalculatedRes := day21.EnterCombinationPrecalculated(tc.combination, robot)
+			require.Equal(t, tc.pressesCount, precalculatedRes)
 		})
 	}
 }
@@ -56,28 +63,40 @@ func TestTwoRobotsE2E(t *testing.T) {
 	} {
 		testName := fmt.Sprintf("combination %s", tc.combination)
 		t.Run(testName, func(t *testing.T) {
-			directPresser := day21.NewManualPresser()
+			// directPresser := day21.NewManualPresser()
 
-			radiationRobot := day21.NewRobotPresser(
-				day21.ArrowPadButtons,
-				directPresser,
-				"banner",
+			// radiationRobot := day21.NewRobotPresser(
+			// 	day21.ArrowPadButtons,
+			// 	directPresser,
+			// 	"banner",
+			// )
+
+			// freezingRobot := day21.NewRobotPresser(
+			// 	day21.NumberPadButtons,
+			// 	radiationRobot,
+			// 	"frosty",
+			// )
+
+			// total := []byte{}
+
+			// for _, c := range tc.combination {
+			// 	res := freezingRobot.Press(byte(c))
+			// 	total = append(total, res...)
+			// }
+			// require.Len(t, total, tc.pressesCount, day21.PrintPresses(total))
+
+			robot := day21.BuildPrecalculatedCostProvider(
+				*day21.NewPad(day21.ArrowPadButtons),
+				day21.ManualPresser{},
+			)
+			fmt.Println("===============")
+			robot2 := day21.BuildPrecalculatedCostProvider(
+				*day21.NewPad(day21.NumberPadButtons),
+				robot,
 			)
 
-			freezingRobot := day21.NewRobotPresser(
-				day21.NumberPadButtons,
-				radiationRobot,
-				"frosty",
-			)
-
-			total := []byte{}
-
-			for _, c := range tc.combination {
-				res := freezingRobot.Press(byte(c))
-				total = append(total, res...)
-			}
-
-			require.Len(t, total, tc.pressesCount, day21.PrintPresses(total))
+			precalculatedRes := day21.EnterCombinationPrecalculated(tc.combination, robot2)
+			require.Equal(t, tc.pressesCount, precalculatedRes)
 		})
 	}
 }
@@ -112,140 +131,22 @@ func TestThreeRobotsE2E(t *testing.T) {
 	} {
 		testName := fmt.Sprintf("combination %s", tc.combination)
 		t.Run(testName, func(t *testing.T) {
-			directPresser := day21.NewManualPresser()
-
-			historianRobot := day21.NewRobotPresser(
-				day21.ArrowPadButtons,
-				directPresser,
-				"historian",
+			robot := day21.BuildPrecalculatedCostProvider(
+				*day21.NewPad(day21.ArrowPadButtons),
+				day21.ManualPresser{},
+			)
+			fmt.Println("===============")
+			robot2 := day21.BuildPrecalculatedCostProvider(
+				*day21.NewPad(day21.ArrowPadButtons),
+				robot,
+			)
+			robot3 := day21.BuildPrecalculatedCostProvider(
+				*day21.NewPad(day21.NumberPadButtons),
+				robot2,
 			)
 
-			frostyRobot := day21.NewRobotPresser(
-				day21.ArrowPadButtons,
-				historianRobot,
-				"frosty",
-			)
-
-			radiationRobot := day21.NewRobotPresser(
-				day21.NumberPadButtons,
-				frostyRobot,
-				"banner",
-			)
-
-			total := []byte{}
-
-			for _, c := range tc.combination {
-				res := radiationRobot.Press(byte(c))
-				total = append(total, res...)
-			}
-
-			require.Len(t, total, tc.pressesCount, day21.PrintPresses(total))
-		})
-	}
-}
-
-func TestSingleArrowsPadBot(t *testing.T) {
-	type testCase struct {
-		from  byte
-		to    byte
-		moves int
-	}
-
-	for _, tc := range []testCase{{
-		from:  '<',
-		to:    'A',
-		moves: len(">>^A"),
-	}} {
-		robot := day21.NewRobotPresser(
-			day21.ArrowPadButtons,
-			day21.ManualPresser{},
-			"indirect",
-		)
-
-		//discard the value, just moving to the starting position
-		_ = robot.Press(tc.from)
-		res := robot.Press(tc.to)
-		require.Len(t, res, tc.moves, day21.PrintPresses(res))
-	}
-}
-
-func TestRobotPresser(t *testing.T) {
-	type testCase struct {
-		from   byte
-		to     byte
-		length int
-		result string
-	}
-
-	for _, tc := range []testCase{
-		{
-			from:   '0',
-			to:     '1',
-			length: 3,
-			result: "^<A",
-		},
-		{
-			from:   '0',
-			to:     '9',
-			length: 5,
-		},
-		{
-			from:   'A',
-			to:     'A',
-			length: 1,
-			result: "A",
-		},
-	} {
-		testName := fmt.Sprintf("direct %c-%c", tc.from, tc.to)
-		t.Run(testName, func(t *testing.T) {
-			directPresser := day21.NewManualPresser()
-
-			indirectPresser := day21.NewRobotPresser(
-				day21.NumberPadButtons,
-				directPresser,
-				"only",
-			)
-
-			//discard the value, just moving to the starting position
-			_ = indirectPresser.Press(tc.from)
-			res := indirectPresser.Press(tc.to)
-
-			require.Len(t, res, tc.length, day21.PrintPresses(res))
-			if tc.result != "" {
-				require.Equal(t, tc.result, string(res), day21.PrintPresses(res))
-			}
-		})
-	}
-
-}
-
-func TestDirect(t *testing.T) {
-	type testCase struct {
-		from   byte
-		to     byte
-		length int
-	}
-
-	testCases := []testCase{}
-	for _, i := range []byte{'1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'A'} {
-		for _, j := range []byte{'1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'A'} {
-			testCases = append(testCases, testCase{
-				from:   i,
-				to:     j,
-				length: 1,
-			})
-		}
-	}
-	for _, tc := range testCases {
-		testName := fmt.Sprintf("direct %c-%c", tc.from, tc.to)
-		t.Run(testName, func(t *testing.T) {
-			presser := day21.NewManualPresser()
-
-			//discard the value, just moving to the starting position
-			_ = presser.Press(tc.from)
-			res := presser.Press(tc.to)
-
-			require.Len(t, res, tc.length, day21.PrintPresses(res))
+			precalculatedRes := day21.EnterCombinationPrecalculated(tc.combination, robot3)
+			require.Equal(t, tc.pressesCount, precalculatedRes)
 		})
 	}
 }
