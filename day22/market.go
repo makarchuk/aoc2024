@@ -51,6 +51,63 @@ func Part1(in io.Reader) (string, error) {
 	return fmt.Sprintf("%d", sum), nil
 }
 
+type sequence [4]int64
+
+func Part2(in io.Reader) (string, error) {
+	input, err := ParseInput(in)
+	if err != nil {
+		return "", err
+	}
+
+	//maps command sequence to the exchange result for each buyer
+	exchangeRates := map[sequence]map[int]int64{}
+
+	changes := make([]sequence, len(input.Secrets))
+	secrets := input.Secrets
+
+	for round := range 2000 {
+		newSecrets := make([]int64, 0, len(secrets))
+		for seller, secret := range secrets {
+			newSecret := NextSecret(secret)
+			newSecrets = append(newSecrets, newSecret)
+
+			priceChange := Price(newSecret) - Price(secret)
+
+			oldChange := changes[seller]
+			newChange := sequence{oldChange[1], oldChange[2], oldChange[3], priceChange}
+			changes[seller] = newChange
+
+			// fmt.Printf("round: %d, seller: %d, sequence: %d\n", round, seller, newChange)
+			if round >= 4 {
+				exchangeRate := exchangeRates[newChange]
+				if exchangeRate == nil {
+					exchangeRate = map[int]int64{}
+				}
+
+				if _, ok := exchangeRate[seller]; !ok {
+					exchangeRate[seller] = Price(newSecret)
+				}
+				exchangeRates[newChange] = exchangeRate
+			}
+		}
+
+		secrets = newSecrets
+	}
+
+	maxBananas := int64(0)
+	for _, rate := range exchangeRates {
+		bananasCount := int64(0)
+		for _, price := range rate {
+			bananasCount += price
+		}
+		if bananasCount > maxBananas {
+			maxBananas = bananasCount
+		}
+	}
+
+	return fmt.Sprintf("%d", maxBananas), nil
+}
+
 func NextSecret(secret int64) int64 {
 	mul := secret * 64
 	secret = mul ^ secret
@@ -65,4 +122,8 @@ func NextSecret(secret int64) int64 {
 	secret = secret % 16777216
 
 	return secret
+}
+
+func Price(secret int64) int64 {
+	return secret % 10
 }
