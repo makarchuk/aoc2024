@@ -77,6 +77,16 @@ func (s Set[T]) Equal(o Set[T]) bool {
 	return true
 }
 
+func (s Set[T]) Intersection(other Set[T]) Set[T] {
+	i := New[T]()
+	for k := range s.m {
+		if other.Contains(k) {
+			i.Add(k)
+		}
+	}
+	return i
+}
+
 func (s Set[T]) MarshalJSON() ([]byte, error) {
 	return json.Marshal(s.List())
 }
